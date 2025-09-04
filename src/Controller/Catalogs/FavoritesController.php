@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FavoritesController extends AbstractController{
     #[Route('/favorites', name: 'favorites')]
-    public function index(): Response {
+    public function favorites(): Response {
         return $this->render('catalogs/favorites.html.twig', []);
     }
 }

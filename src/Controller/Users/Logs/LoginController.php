@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class LoginController extends AbstractController{
     #[Route('/login', name: 'login')]
-    public function index(): Response {
+    public function login(): Response {
         return $this->render('users/logs/login.html.twig', []);
     }
 }

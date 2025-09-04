@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ListingController extends AbstractController{
     #[Route('/listing', name: 'listing')]
-    public function index(): Response {
+    public function listing(): Response {
         return $this->render('catalogs/listing/listing.html.twig', []);
     }
 }

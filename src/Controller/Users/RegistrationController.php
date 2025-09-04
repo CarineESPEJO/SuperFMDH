@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RegistrationController extends AbstractController{
     #[Route('/registration', name: 'registration')]
-    public function index(): Response {
+    public function registration(): Response {
         return $this->render('users/registration.html.twig', []);
     }
 }
