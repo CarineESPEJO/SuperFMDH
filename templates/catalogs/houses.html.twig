@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>
+        <?= htmlspecialchars($propertyType) ?> Listings
+    </title>
+    <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/header_footer.css">
+    <link rel="stylesheet" href="/assets/css/catalog.css">
+    <script src="/assets/js/favoriteButton.js" defer></script>
+    <script src="/assets/js/pagination.js" defer></script>
+</head>
+
+<body>
+    {% include '/components/header.html.twig' %}
+
+    <main>
+        <section>
+            <h2>
+                <?= htmlspecialchars($pageTitle) ?>
+            </h2>
+            <hr>
+
+            <!-- Search form (only for Search & Favorites) -->
+            <?php if ($propertyType === 'Search' || $propertyType === 'Favorite'): ?>
+            <form method="GET" style="margin-bottom:20px; display:flex; gap:10px; flex-wrap:wrap;">
+                <input type="hidden" name="type" value="<?= htmlspecialchars($propertyType) ?>">
+
+                <input type="text" name="city" placeholder="Ville" value="<?= htmlspecialchars($filters['city']) ?>">
+
+                <input type="number" name="max_price" placeholder="Prix max"
+                    value="<?= htmlspecialchars($filters['max_price']) ?>">
+
+                <select name="property_type">
+                    <option value="">Type de bien</option>
+                    <?php foreach ($propertyTypes as $pt): ?>
+                    <option value="<?= $pt['id'] ?>" <?=$filters['property_type']==$pt['id'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($pt['name']) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <select name="transaction_type">
+                    <option value="">Type de transaction</option>
+                    <?php foreach ($transactionTypes as $tt): ?>
+                    <option value="<?= $tt['id'] ?>" <?=$filters['transaction_type']==$tt['id'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($tt['name']) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <button type="submit">Rechercher</button>
+            </form>
+            <?php endif; ?>
+
+            <div>
+                <?php foreach ($listings as $annonce): ?>
+                <?php
+                    $isFavorited = in_array($annonce['id'], $favorites);
+                    include __DIR__ . '/../app/Views/Components/VignetteView.php';
+                    ?>
+                <?php endforeach; ?>
+            </div>
+        </section>
+
+        <?php if (!$ajaxRequest && $totalCount > 12): ?>
+        <form method="POST" style="margin-top:20px; display:flex; gap:10px; align-items:center;">
+            <button type="submit" name="decrease" <?=$offset==0 ? 'disabled' : '' ?>>Page précédente</button>
+
+            <span>
+                Page
+                <?= floor($offset / 12) + 1 ?> /
+                <?= ceil($totalCount / 12) ?>
+            </span>
+
+            <input type="number" name="goto_page" min="1" max="<?= ceil($totalCount / 12) ?>"
+                value="<?= floor($offset / 12) + 1 ?>" style="width:60px; text-align:center;">
+            <button type="submit" name="go">Aller</button>
+
+            <button type="submit" name="increase" <?=($offset + 12)>= $totalCount ? 'disabled' : '' ?>>Page
+                suivante</button>
+        </form>
+        <?php endif; ?>
+    </main>
+
+    <?php require_once __DIR__ . '/../app/Views/Components/Footer.php'; ?>
+</body>
+
+</html>

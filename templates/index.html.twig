@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+{% block title %}Find My Dream Home - Annonces Immobilières{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('styles/catalogs.css') }}">
+{% endblock %}
+
+
+
+
+{% block body %}
+<main>
+    <section>
+        <h2>Nos annonces de maisons</h2>
+        <hr>
+        <div>
+            {% for annonce in houses %}
+            {% include '_partials/_card.html.twig' with {'userId' : userId,'annonce': annonce} %}
+            {% else %}
+            <p>Aucune maison trouvée.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section>
+        <h2>Nos annonces d'appartements</h2>
+        <hr>
+        <div>
+            {% for annonce in apartments %}
+            {% include '_partials/_card.html.twig' with {'userId' : userId, 'annonce': annonce} %}
+            {% else %}
+            <p>Aucun appartement trouvé.</p>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+{% endblock %}
