@@ -1,8 +1,8 @@
 <header>
     <nav>
         <div>
-            <a href="/index.html.twig">
-                <img src="{{asset('images/logo_big.PNG')}}" alt="Logo">
+            <a href="{{ path('home')}}">
+                <img src=" {{asset('images/logo_big.PNG')}}" alt="Logo">
                 <b>Find My Dream Home</b>
             </a>
         </div>
@@ -12,19 +12,19 @@
         {% endif %}
 
         <ul>
-            <li><a href="/catalogs/houses.html.twig">Maisons</a></li>
-            <li><a href="/catalogs/apartments.html.twig">Apartements</a></li>
-            <li><a href="/catalogs/search.html.twig">Rechercher</a></li>
+            <li><a href="{{ path('houses')}}">Maisons</a></li>
+            <li><a href="{{ path('apartments')}}">Apartements</a></li>
+            <li><a href="{{ path('search')}}">Rechercher</a></li>
             {% if isLoggedIn %}
-            <li><a href="/catalogs/favorites.html.twig">Favoris</a></li>
+            <li><a href="{{ path('favorites')}}">Favoris</a></li>
             {% endif %}
             {% if userRole in ['admin', 'agent'] %}
-            <li class="login"><a href="/catalogs/listing/createListing.html.twig">Ajouter</a></li>
+            <li class="login"><a href="{{ path('createlisting')}}">Ajouter</a></li>
             {% endif %}
             {% if isLoggedIn %}
-            <li class="login"><a href="/users/logs/logout.hmtl.twig">Deconnexion</a></li>
+            <li class="login"><a href="{{ path('logout')}}">Deconnexion</a></li>
             {% else %}
-            <li class="login"><a href="/users/logs/login.hmtl.twig">Connexion</a></li>
+            <li class="login"><a href="{{ path('login')}}">Connexion</a></li>
             {% endif %}
         </ul>
     </nav>

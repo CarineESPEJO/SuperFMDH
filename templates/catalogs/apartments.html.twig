@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Find My Dream Home - Appartements{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('styles/catalogs.css') }}">
+{% endblock %}
+
+{% block body %}
+<main>
+    <section>
+        <h2>Nos annonces d'Appartements</h2>
+        <hr>
+        <div class="listings-grid">
+            {% for listing in listings %}
+                {% include '_partials/_card.html.twig' with {'userId': userId, 'listing': listing} %}
+            {% else %}
+                <p>Aucun appartement trouvé.</p>
+            {% endfor %}
+        </div>
+
+        {% if totalPages > 1 %}
+        <form method="post" class="pagination-form" style="margin-top:20px; display:flex; gap:10px; align-items:center;">
+            <button type="submit" name="decrease" {% if currentPage == 1 %}disabled{% endif %}>Page précédente</button>
+
+            <span>
+                Page {{ currentPage }} / {{ totalPages }}
+            </span>
+
+            <input type="number" name="goto_page" min="1" max="{{ totalPages }}" value="{{ currentPage }}" style="width:60px; text-align:center;">
+            <button type="submit" name="go">Aller</button>
+
+            <button type="submit" name="increase" {% if currentPage == totalPages %}disabled{% endif %}>Page suivante</button>
+        </form>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

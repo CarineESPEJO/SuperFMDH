@@ -1,1 +1,57 @@
-<h1>{{listing.id}}</h1>
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('styles/listing.css') }}">
+{% endblock %}
+
+{% block body %}
+<main class="listing-container">
+    <div class="listing-image">
+        <img src="{{ asset(listing.imageUrl) }}" alt="Image de l'annonce">
+    </div>
+
+    <div class="listing-info">
+        <h1>
+            {{ listing.title }}
+        </h1>
+        <p class="price">
+            {{ listing.price }}
+            {{ listing.transactionType.name == 'Rent' ? '€/mois' : '€' }}
+        </p>
+        <p class="location">{{ listing.city|e }}, FRANCE</p>
+        <p class="type">
+            {{ listing.propertyType.name == 'House' ? 'Maison' : 'Appartement'}}
+        </p>
+
+
+        <div class="listing-actions">
+            {% include '_Partials/_favorite-button.html.twig' with {
+            listingId: listing.id,
+            isFavorited: isFavorited
+            } %}
+
+            <?php include __DIR__ . '/../app/Views/Components/Buttons/FavoriteButton.php'; ?>
+            <?php if (!empty($_SESSION["userRole"]) && ($_SESSION["userRole"] === "admin" || ($_SESSION["userRole"] === "agent" && $_SESSION["userId"] === $annonce['user_id']))): ?>
+            <a class="contact" href="/formsLayout.php?form=UpdateListing&id=<?= (int)$annonce['id'] ?>">Modifier</a>
+            <button class="contact" id="deleteBtn">Supprimer</button>
+            <?php endif; ?>
+        </div>
+    </div>
+
+
+    <div class="listing-description">
+        <h2>Description</h2>
+        <p class="description">{{ listing.description|e }}</p>
+    </div>
+
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <p>Voulez-vous vraiment supprimer cette annonce ?</p>
+            <div class="modal-actions">
+                <a href="/DeleteListing.php?id=<?= urlencode($annonce['id']) ?>" class="btn-confirm">Oui</a>
+                <button id="cancelBtn" class="btn-cancel">Non</button>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% if userId %}
-<button class="favoris {{ isFavorited ? 'favorited' : '' }}" data-annonce-id="{{ annonceId }}">
+<button class="favoris {{ isFavorited ? 'favorited' : '' }}" data-listing-id="{{ listingId }}">
     {{ isFavorited ? 'Supprimer des favoris' : 'Ajouter aux favoris' }}
 </button>
 {% else %}

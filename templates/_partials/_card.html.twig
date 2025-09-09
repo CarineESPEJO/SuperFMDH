@@ -1,28 +1,30 @@
 <article class="card">
-    <a class="card-link" href="{{ path('listing', {'id': annonce.id}) }}">
-        <img src="{{ annonce.img|e }}" alt="Image de l'annonce" />
+    <a class="card-link" href="{{ path('listing', {'id': listing.id}) }}">
+        <img src="{{ asset(listing.imageUrl) }}" alt="Image de l'annonce">
+
         <div>
-            <h3 class="title">{{ annonce.title|e }}</h3>
+            <h3 class="title">{{ listing.title|e }}</h3>
             <h4>
-                {{ annonce.price|e }}
-                {{ annonce.transaction == 'Rent' ? '€/mois' : '€' }}
+                {{ listing.price|e }}
+                {{ listing.transactionType.name == 'Rent' ? '€/mois' : '€' }}
             </h4>
-            <p class="capitalize">{{ annonce.city|e }}, FRANCE</p>
-            <p class="description">{{ annonce.description|e }}</p>
+            <p class="capitalize">{{ listing.city|e }}, FRANCE</p>
+            <p class="description">{{ listing.description|e }}</p>
             <p class="property">
-                {{ annonce.property == 'House' ? 'Maison' : 'Appartement' }}
+                {{ listing.propertyType.name == 'House' ? 'Maison' : 'Appartement' }}
             </p>
         </div>
     </a>
 
-    {% set annonceId = annonce.id %}
-    {% set isFavorited = userId ? (annonceId in favorites) : false %}
+    {% set isFavorited = userId ? (listing.id in favorites) : false %}
 
     {% include '_Partials/_favorite-button.html.twig' with {
-    annonceId: annonceId,
+    listingId: listing.id,
     isFavorited: isFavorited
     } %}
 
     <a class="contact contact-btn"
-        href="https://inspirationfeed.com/wp-content/uploads/2022/12/Hello-memes11-350x250.jpg">Contact</a>
+        href="https://inspirationfeed.com/wp-content/uploads/2022/12/Hello-memes11-350x250.jpg">
+        Contact
+    </a>
 </article>

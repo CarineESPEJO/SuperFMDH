@@ -1,0 +1,230 @@
+/* === Section and grid for catalog listings === */
+section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0;
+    width: 100%;
+}
+
+section>div {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    min-width: 0;
+}
+
+article {
+    background-color: white;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding-bottom: 4rem;
+}
+
+article>div {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 1rem;
+    flex-grow: 1;
+}
+
+article>a>img {
+    width: 100%;
+    height: 12rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
+
+article>a>h3 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+}
+
+.title,
+.description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vignette {
+    position: relative;
+    overflow: hidden;
+}
+
+.vignette-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    height: 100%;
+}
+
+.vignette-link>div {
+    height: 100%;
+}
+
+.contact-btn {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 0.5rem;
+    z-index: 2;
+    background-color: #31a2ff;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.contact-btn:hover {
+    background-color: #007bff;
+}
+
+.favoris {
+    background-color: #8f8f8f;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 0.25rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.favoris.favorited {
+    background-color: #bb9e1f;
+    color: white;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: space-around;
+}
+
+.btn-cancel {
+    background-color: #ccc;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.btn-confirm {
+    background-color: red;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    text-decoration: none;
+}
+
+.btn-confirm:hover {
+    background-color: darkred;
+}
+
+img {
+    width: 100px;
+    height: 50px;
+}
+
+/* === Listing Page Vertical Layout === */
+.listing-container {
+    max-width: 800px;
+    width: 90%;
+    margin: 3rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.listing-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    object-fit: cover;
+}
+
+.listing-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.listing-info h1 {
+    font-size: 2rem;
+    color: #333;
+}
+
+.listing-info .price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #31a2ff;
+}
+
+.listing-info .location,
+.listing-info .type {
+    font-size: 1rem;
+    color: #555;
+}
+
+.listing-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.listing-actions .favoris,
+.listing-actions .contact {
+    flex: 1;
+    text-align: center;
+}
+
+.listing-description {
+    margin-top: 1rem;
+}
+
+.listing-description h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.listing-description p {
+    line-height: 1.6;
+    color: #444;
+}

@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+{% block title %}Find My Dream Home - Recherche{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset('styles/catalogs.css') }}">
+{% endblock %}
+
+
+{% block body %}
+<main>
+    <section>
+        <h2>Toutes nos annonces</h2>
+        <hr>
+        <div class="listings-grid">
+            {% for listing in listings %}
+            {% include '_partials/_card.html.twig' with {'userId' : userId, 'listing': listing} %}
+            {% else %}
+            <p>Aucune annonce trouvée.</p>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+{% endblock %}
