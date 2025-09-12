@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+{% block title %}Find My Dream Home - Recherche{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('styles/catalogs.css') }}">
+{% endblock %}
+
+
+{% block body %}
+<main>
+    <section>
+        <h2>Toutes nos annonces</h2>
+        <hr>
+
+        {% include '_partials/_search-bar.html.twig' with {
+        actionPath: path('allListings'),
+        query: app.request.query.get('q')
+        } %}
+
+        <div class="listings-grid">
+            {% for listing in listings %}
+            {% include '_partials/_card.html.twig' with {
+            listing: listing,
+            favoriteIds: favoriteIds,
+            userId: userId,
+            isLoggedIn: isLoggedIn,
+            userEmail: userEmail,
+            } %}
+            {% else %}
+            <p>Aucune annonce trouvée.</p>
+            {% endfor %}
+        </div>
+
+        {% include '_partials/_pagination.html.twig' with {
+        routeName: 'allListings',
+        currentPage: currentPage,
+        totalPages: totalPages,
+        query: app.request.query.get('q')
+        } %}
+    </section>
+</main>
+{% endblock %}

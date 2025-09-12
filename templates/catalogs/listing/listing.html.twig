@@ -1,7 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block stylesheets %}
+{{ parent() }}
 <link rel="stylesheet" href="{{ asset('styles/listing.css') }}">
 {% endblock %}
+
 
 {% block body %}
 <main class="listing-container">
@@ -31,7 +33,7 @@
 
             <?php include __DIR__ . '/../app/Views/Components/Buttons/FavoriteButton.php'; ?>
             <?php if (!empty($_SESSION["userRole"]) && ($_SESSION["userRole"] === "admin" || ($_SESSION["userRole"] === "agent" && $_SESSION["userId"] === $annonce['user_id']))): ?>
-            <a class="contact" href="/formsLayout.php?form=UpdateListing&id=<?= (int)$annonce['id'] ?>">Modifier</a>
+            <a class="contact" href="{{ path('modifylisting', { id: listing.id }) }}">Modifier</a>
             <button class="contact" id="deleteBtn">Supprimer</button>
             <?php endif; ?>
         </div>

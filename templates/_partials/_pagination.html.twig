@@ -1,0 +1,19 @@
+<div class="pagination">
+    {% if currentPage > 1 %}
+    <a class="btn" href="{{ path(routeName, {page: currentPage - 1}) }}{% if query %}?q={{ query }}{% endif %}">
+        ← Précédent
+    </a>
+    {% else %}
+    <button class="btn" disabled>← Précédent</button>
+    {% endif %}
+
+    <span>Page {{ currentPage }} / {{ totalPages }}</span>
+
+    {% if currentPage < totalPages %} <a class="btn"
+        href="{{ path(routeName, {page: currentPage + 1}) }}{% if query %}?q={{ query }}{% endif %}">
+        Suivant →
+        </a>
+        {% else %}
+        <button class="btn" disabled>Suivant →</button>
+        {% endif %}
+</div>

@@ -209,7 +209,7 @@ img {
     margin-top: 1rem;
 }
 
-.listing-actions .favoris,
+.listing-actions .favorite-btn,
 .listing-actions .contact {
     flex: 1;
     text-align: center;

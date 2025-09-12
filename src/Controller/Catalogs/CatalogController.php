@@ -2,130 +2,157 @@
 
 namespace App\Controller\Catalogs;
 
-use App\Entity\PropertyType;
+use App\Entity\User;
 use App\Repository\ListingRepository;
-use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('/catalogs')]
 class CatalogController extends AbstractController
 {
-    private int $perPage = 12;
+    public function __construct(private EntityManagerInterface $entityManager) {}
 
-    private function paginate(array $items, Request $request): array
+    public function getUser(): ?User
     {
-        $currentPage = max((int)$request->query->get('page', 1), 1);
-        $totalItems = count($items);
-        $totalPages = (int)ceil($totalItems / $this->perPage);
-
-        $paginatedItems = array_slice($items, ($currentPage - 1) * $this->perPage, $this->perPage);
-
-        return [
-            'listings' => $paginatedItems,
-            'currentPage' => $currentPage,
-            'totalPages' => $totalPages,
-        ];
+        return parent::getUser();
     }
 
-    #[Route('/apartments', name: 'apartments')]
-    public function apartments(
-        ListingRepository $listingRepository,
-        UserRepository $userRepository,
-        Request $request
-    ): Response {
-
-        $user = $this->getUser() ?? $userRepository->find(1);
-        $userId = $user ? $user->getId() : null;
-
-
-        $favorites = [];
-        if ($user) {
-            foreach ($user->getFavoriteListings() as $fav) {
-                $favorites[] = $fav->getId();
-            }
+    #[Route('/favorites/toggle/{id}', name: 'toggle_favorite', methods: ['POST'])]
+    public function toggleFavorite($id, ListingRepository $listingRepository): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['status' => 'error', 'message' => 'User not logged in'], 403);
         }
 
+        $listing = $listingRepository->find($id);
+        if (!$listing) {
+            return $this->json(['status' => 'error', 'message' => 'Listing not found'], 404);
+        }
 
-        $propertyType = 2;
-        $allListings = $listingRepository->findBy(['propertyType' => $propertyType], ['created_at' => 'DESC']);
+        if ($user->getFavoriteListings()->contains($listing)) {
+            $user->removeFavoriteListing($listing);
+            $this->entityManager->flush();
+            return $this->json(['status' => 'removed']);
+        }
 
-        $pagination = $this->paginate($allListings, $request);
+        $user->addFavoriteListing($listing);
+        $this->entityManager->flush();
+        return $this->json(['status' => 'added']);
+    }
 
-        return $this->render('catalogs/apartments.html.twig', [
-            'listings' => $pagination['listings'],
-            'favorites' => $favorites,
-            'userId' => $userId,
-            'currentPage' => $pagination['currentPage'],
-            'totalPages' => $pagination['totalPages'],
-        ]);
+    #[Route('/all', name: 'allListings')]
+    public function allListings(ListingRepository $listingRepository, Request $request): Response
+    {
+        return $this->renderListingPage($listingRepository, $request);
     }
 
     #[Route('/houses', name: 'houses')]
-    public function houses(
-        ListingRepository $listingRepository,
-        UserRepository $userRepository,
-        Request $request
-    ): Response {
-        $user = $this->getUser() ?? $userRepository->find(1);
-        $userId = $user ? $user->getId() : null;
+    public function houses(ListingRepository $listingRepository, Request $request): Response
+    {
+        return $this->renderListingPage($listingRepository, $request, 'House');
+    }
 
-        $favorites = [];
-        if ($user) {
-            foreach ($user->getFavoriteListings() as $fav) {
-                $favorites[] = $fav->getId();
-            }
-        }
-
-
-        $allListings = $listingRepository->findBy(['propertyType' => 1], ['created_at' => 'DESC']);
-        $pagination = $this->paginate($allListings, $request);
-
-        return $this->render('catalogs/houses.html.twig', [
-            'listings' => $pagination['listings'],
-            'favorites' => $favorites,
-            'userId' => $userId,
-            'currentPage' => $pagination['currentPage'],
-            'totalPages' => $pagination['totalPages'],
-        ]);
+    #[Route('/apartments', name: 'apartments')]
+    public function apartments(ListingRepository $listingRepository, Request $request): Response
+    {
+        return $this->renderListingPage($listingRepository, $request, 'Apartment');
     }
 
     #[Route('/favorites', name: 'favorites')]
-    public function favorites(UserRepository $userRepository, Request $request): Response
+    public function favorites(ListingRepository $listingRepository, Request $request): Response
     {
-        $user = $this->getUser() ?? $userRepository->find(1);
-        $userId = $user ? $user->getId() : null;
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
 
-        $allListings = $user ? $user->getFavoriteListings()->toArray() : [];
+        $userId = $user->getId();
+        $favoriteIds = $user->getFavoriteListings()
+            ->map(fn($listing) => $listing->getId())
+            ->toArray();
 
-        $pagination = $this->paginate($allListings, $request);
+        $currentPage = max(1, (int) $request->query->get('page', 1));
+        $limit = 6;
+
+        $qb = $listingRepository->createQueryBuilder('l')
+            ->where('l.id IN (:ids)')
+            ->setParameter('ids', $favoriteIds ?: [0])
+            ->orderBy('l.created_at', 'DESC');
+
+        $totalListings = count($qb->getQuery()->getResult());
+        $totalPages = (int) ceil($totalListings / $limit);
+
+        $listings = $qb->setFirstResult(($currentPage - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
 
         return $this->render('catalogs/favorites.html.twig', [
-            'listings' => $pagination['listings'],
-            'favorites' => array_map(fn($l) => $l->getId(), $allListings),
+            'listings' => $listings,
+            'favoriteIds' => $favoriteIds,
             'userId' => $userId,
-            'currentPage' => $pagination['currentPage'],
-            'totalPages' => $pagination['totalPages'],
+            'isLoggedIn' => (bool) $user,
+            'userEmail' => $user->getEmail(),
+            'userRole' => $user->getRoles()[0] ?? null,
+            'currentPage' => $currentPage,
+            'totalPages' => $totalPages,
         ]);
     }
 
-    #[Route('/search', name: 'search')]
-    public function search(UserRepository $userRepository, Request $request): Response
+    private function renderListingPage(ListingRepository $listingRepository, Request $request, ?string $propertyType = null): Response
     {
-        $user = $this->getUser() ?? $userRepository->find(1);
-        $userId = $user ? $user->getId() : null;
+        $query = $request->query->get('q', '');
+        $currentPage = max(1, (int) $request->query->get('page', 1));
+        $limit = 6;
 
-        $allListings = $user ? $user->getFavoriteListings()->toArray() : [];
+        $qb = $listingRepository->createQueryBuilder('l');
 
-        $pagination = $this->paginate($allListings, $request);
+        if ($propertyType) {
+            $qb->join('l.propertyType', 'pt')
+                ->where('pt.name = :type')
+                ->setParameter('type', $propertyType);
+        }
 
-        return $this->render('catalogs/favorites.html.twig', [
-            'listings' => $pagination['listings'],
-            'favorites' => array_map(fn($l) => $l->getId(), $allListings),
+        if ($query) {
+            $qb->andWhere('l.title LIKE :query OR l.description LIKE :query')
+                ->setParameter('query', "%$query%");
+        }
+
+        $qb->orderBy('l.created_at', 'DESC');
+
+        $totalListings = count($qb->getQuery()->getResult());
+        $totalPages = (int) ceil($totalListings / $limit);
+
+        $listings = $qb->setFirstResult(($currentPage - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        $user = $this->getUser();
+        $userId = null;
+        $favoriteIds = [];
+
+        if ($user) {
+            $userId = $user->getId();
+            $favoriteIds = $user->getFavoriteListings()
+                ->map(fn($listing) => $listing->getId())
+                ->toArray();
+        }
+
+        return $this->render('catalogs/all-listings.html.twig', [
+            'listings' => $listings,
+            'favoriteIds' => $favoriteIds,
             'userId' => $userId,
-            'currentPage' => $pagination['currentPage'],
-            'totalPages' => $pagination['totalPages'],
+            'isLoggedIn' => (bool) $user,
+            'userEmail' => $user?->getEmail(),
+            'currentPage' => $currentPage,
+            'totalPages' => $totalPages,
+            'query' => $query,
         ]);
     }
 }

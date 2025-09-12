@@ -1,30 +1,27 @@
+{% set isFavorited = userId ? (listing.id in favoriteIds) : false %}
+
 <article class="card">
     <a class="card-link" href="{{ path('listing', {'id': listing.id}) }}">
         <img src="{{ asset(listing.imageUrl) }}" alt="Image de l'annonce">
-
         <div>
             <h3 class="title">{{ listing.title|e }}</h3>
-            <h4>
-                {{ listing.price|e }}
-                {{ listing.transactionType.name == 'Rent' ? '€/mois' : '€' }}
-            </h4>
+            <h4>{{ listing.price|e }} {{ listing.transactionType.name == 'Rent' ? '€/mois' : '€' }}</h4>
             <p class="capitalize">{{ listing.city|e }}, FRANCE</p>
             <p class="description">{{ listing.description|e }}</p>
-            <p class="property">
-                {{ listing.propertyType.name == 'House' ? 'Maison' : 'Appartement' }}
-            </p>
+            <p class="property">{{ listing.propertyType.name == 'House' ? 'Maison' : 'Appartement' }}</p>
         </div>
     </a>
 
-    {% set isFavorited = userId ? (listing.id in favorites) : false %}
+    <div class="card-actions">
+        {% include '_partials/_favorite-button.html.twig' with {
+        listingId: listing.id,
+        isFavorited: isFavorited,
+        userId: userId
+        } %}
 
-    {% include '_Partials/_favorite-button.html.twig' with {
-    listingId: listing.id,
-    isFavorited: isFavorited
-    } %}
-
-    <a class="contact contact-btn"
-        href="https://inspirationfeed.com/wp-content/uploads/2022/12/Hello-memes11-350x250.jpg">
-        Contact
-    </a>
+        <a class="contact contact-btn"
+            href="https://inspirationfeed.com/wp-content/uploads/2022/12/Hello-memes11-350x250.jpg">
+            Contact
+        </a>
+    </div>
 </article>

@@ -1,10 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block title %}Find My Dream Home - Annonces Immobilières{% endblock %}
 {% block stylesheets %}
-<link rel="stylesheet" href="{{ asset('styles/catalogs.css') }}">
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('build/catalogs.css') }}">
 {% endblock %}
-
-
 
 
 {% block body %}
@@ -12,11 +11,17 @@
     <section>
         <h2>Nos annonces de maisons</h2>
         <hr>
-        <div>
+        <div class="listings-grid">
             {% for listing in houses %}
-            {% include '_partials/_card.html.twig' with {'userId' : userId, 'listing': listing} %}
+            {% include '_partials/_card.html.twig' with {
+            listing: listing,
+            favoriteIds: favoriteIds,
+            userId: userId,
+            isLoggedIn: isLoggedIn,
+            userEmail: userEmail,
+            } %}
             {% else %}
-            <p>Aucune maison trouvée.</p>
+            <p>Aucune annonce trouvée.</p>
             {% endfor %}
         </div>
     </section>
@@ -24,11 +29,17 @@
     <section>
         <h2>Nos annonces d'appartements</h2>
         <hr>
-        <div>
+        <div class="listings-grid">
             {% for listing in apartments %}
-            {% include '_partials/_card.html.twig' with {'userId' : userId, 'listing': listing} %}
+            {% include '_partials/_card.html.twig' with {
+            listing: listing,
+            favoriteIds: favoriteIds,
+            userId: userId,
+            isLoggedIn: isLoggedIn,
+            userEmail: userEmail,
+            } %}
             {% else %}
-            <p>Aucun appartement trouvé.</p>
+            <p>Aucune annonce trouvée.</p>
             {% endfor %}
         </div>
     </section>

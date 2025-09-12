@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+{% block title %}Find My Dream Home - Modifier une annonce {% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('styles/forms.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="body-wrapper">
+    <aside>
+        <img src="{{ asset('images/login_img.jpeg') }}" alt="Login visual">
+    </aside>
+
+    <div class="main-wrapper">
+        <main>
+            <h2>Modifier l'annonce <br><b>{{ listing.title }}</b></h2>
+
+            {#{% if isLoggedIn and userRole in ['admin', 'agent'] %}#}
+            {% if errors.general is defined %}
+            <p style="color: red;">
+                {{ errors.general }}
+            </p>
+            {% endif %}
+
+            {% include 'catalogs/listing/_form.html.twig' with {'button_label': 'Modifier l\'annonce'} %}
+
+
+            {#{% else %}
+            <p>Vous devez être connecté .</p>
+
+            {% endif %}#}
+
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -7,54 +7,68 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\User;
 use App\Entity\PropertyType;
 use App\Entity\TransactionType;
+use App\Entity\Trait\TimestampableTrait;
+use App\Entity\Interface\TimestampableInterface;
 
 #[ORM\Entity(repositoryClass: ListingRepository::class)]
 #[ORM\Table(name: "listing")]
-class Listing
+#[ORM\HasLifecycleCallbacks]
+class Listing implements TimestampableInterface
 {
+    use TimestampableTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 5, max: 255)]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 50, max: 1000)]
     private ?string $description = null;
 
-    #[ORM\Column]
-    private ?int $price = null;
+    #[ORM\Column(type: "decimal", precision: 10, scale: 2)]
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private ?float $price = null;
 
     #[ORM\Column(length: 150)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 1, max: 150)]
     private ?string $city = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/\.(jpg|jpeg|png|webp)$/i',
+        message: 'The image must be a JPG, JPEG, PNG, or WEBP file'
+    )]
     private ?string $image_url = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $updated_at = null;
-
-    //  Relations ManyToOne
+    // 🔹 Relations
     #[ORM\ManyToOne(inversedBy: "listings")]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "Property type must be set.")]
     private ?PropertyType $propertyType = null;
 
     #[ORM\ManyToOne(inversedBy: "listings")]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "Transaction type must be set.")]
     private ?TransactionType $transactionType = null;
 
     #[ORM\ManyToOne(inversedBy: "listings")]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "User must be set.")]
     private ?User $user = null;
 
-    // Relation ManyToMany inverse
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: "favoriteListings")]
     private Collection $favoritedBy;
 
@@ -89,13 +103,13 @@ class Listing
         return $this;
     }
 
-    public function getPrice(): ?int
+    public function getPrice(): ?float
     {
         return $this->price;
     }
-    public function setPrice(int $price): self
+    public function setPrice(float $price): self
     {
-        $this->price = $price;
+        $this->price = round($price, 2);
         return $this;
     }
 
@@ -118,27 +132,6 @@ class Listing
         $this->image_url = $image_url;
         return $this;
     }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->created_at;
-    }
-    public function setCreatedAt(\DateTimeImmutable $created_at): self
-    {
-        $this->created_at = $created_at;
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updated_at;
-    }
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): self
-    {
-        $this->updated_at = $updated_at;
-        return $this;
-    }
-
 
     public function getPropertyType(): ?PropertyType
     {

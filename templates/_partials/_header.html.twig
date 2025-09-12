@@ -7,25 +7,24 @@
             </a>
         </div>
 
-        {% if isLoggedIn %}
-        <p>Bonjour {{ userEmail|e }}</p>
-        {% endif %}
 
         <ul>
             <li><a href="{{ path('houses')}}">Maisons</a></li>
-            <li><a href="{{ path('apartments')}}">Apartements</a></li>
-            <li><a href="{{ path('search')}}">Rechercher</a></li>
-            {% if isLoggedIn %}
+            <li><a href="{{ path('apartments')}}">Appartements</a></li>
+            <li><a href="{{ path('allListings')}}">Annonces</a></li>
+
+            {% if app.user %}
             <li><a href="{{ path('favorites')}}">Favoris</a></li>
-            {% endif %}
-            {% if userRole in ['admin', 'agent'] %}
+
+            {% if 'ROLE_ADMIN' in app.user.roles or 'ROLE_AGENT' in app.user.roles %}
             <li class="login"><a href="{{ path('createlisting')}}">Ajouter</a></li>
             {% endif %}
-            {% if isLoggedIn %}
-            <li class="login"><a href="{{ path('logout')}}">Deconnexion</a></li>
+
+            <li class="login"><a href="{{ path('app_logout')}}">Déconnexion</a></li>
             {% else %}
-            <li class="login"><a href="{{ path('login')}}">Connexion</a></li>
+            <li class="login"><a href="{{ path('app_login')}}">Connexion</a></li>
             {% endif %}
+
         </ul>
     </nav>
 </header>

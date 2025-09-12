@@ -1,28 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Welcome!{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://kit.fontawesome.com/8a0ae65aed.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Symfony App{% endblock %}</title>
+
+    {# CSRF token for Stimulus controller #}
+    <meta name="csrf-token" content="{{ csrf_token('authenticate') }}">
+
     {% block stylesheets %}
+    {{ encore_entry_link_tags('app') }}
     {% endblock %}
 
     {% block javascripts %}
-    {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {{ encore_entry_script_tags('app') }}
     {% endblock %}
+
 </head>
 
 <body>
-    {% include '_partials/_header.html.twig' with {
-    'isLoggedIn': isLoggedIn|default(false),
-    'userRole': userRole|default(null),
-    'userEmail': userEmail|default(null)
-    } %}
+    {% include '_partials/_header.html.twig' %}
 
     {% block body %}{% endblock %}
-    {% include '_partials/_footer.html.twig' %}
+
+
 </body>
 
 </html>

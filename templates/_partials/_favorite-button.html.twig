@@ -1,7 +1,4 @@
-{% if userId %}
-<button class="favoris {{ isFavorited ? 'favorited' : '' }}" data-listing-id="{{ listingId }}">
-    {{ isFavorited ? 'Supprimer des favoris' : 'Ajouter aux favoris' }}
+<button data-controller="favorite" data-favorite-url-value="{{ path('favorite_toggle', {'id': listing.id}) }}"
+    class="favorite-btn {% if isFavorited %}favorited{% endif %}">
+    ♥
 </button>
-{% else %}
-<button class="favoris" disabled>Connexion requise</button>
-{% endif %}

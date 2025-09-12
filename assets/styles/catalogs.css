@@ -93,7 +93,7 @@ section>div {
     background-color: #007bff;
 }
 
-.favoris {
+.favorite-btn {
     position: absolute;
     top: 0.75rem;
     right: 0.5rem;
@@ -118,4 +118,45 @@ form {
     display: flex;
     justify-content: center;
     padding: 1rem;
+}
+
+.catalog-search {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.catalog-search input {
+    flex: 1;
+    padding: 0.5rem;
+}
+
+.pagination {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.pagination .btn {
+    padding: 0.5rem 1rem;
+    background-color: #eee;
+    border: none;
+    cursor: pointer;
+}
+
+.pagination .btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.favorite-btn {
+    color: #888;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.favorite-btn.favorited {
+    color: red;
 }

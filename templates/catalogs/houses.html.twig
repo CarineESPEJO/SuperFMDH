@@ -1,22 +1,40 @@
 {% extends 'base.html.twig' %}
 {% block title %}Find My Dream Home - Maisons{% endblock %}
 {% block stylesheets %}
+{{ parent() }}
 <link rel="stylesheet" href="{{ asset('styles/catalogs.css') }}">
 {% endblock %}
-
 
 {% block body %}
 <main>
     <section>
         <h2>Nos annonces de Maisons</h2>
         <hr>
+
+        {% include '_partials/_search-bar.html.twig' with {
+        actionPath: path('houses'),
+        query: app.request.query.get('q')
+        } %}
+
         <div class="listings-grid">
             {% for listing in listings %}
-            {% include '_partials/_card.html.twig' with {'userId' : userId, 'listing': listing} %}
+            {% include '_partials/_card.html.twig' with {
+            'listing': listing,
+            'favoriteIds': favoriteIds,
+            'userId': userId
+            } %}
             {% else %}
-            <p>Aucune maison trouvée.</p>
+            <p>Aucune annonce trouvée.</p>
             {% endfor %}
+
         </div>
+
+        {% include '_partials/_pagination.html.twig' with {
+        routeName: 'houses',
+        currentPage: currentPage,
+        totalPages: totalPages,
+        query: app.request.query.get('q')
+        } %}
     </section>
 </main>
 {% endblock %}
