@@ -22,8 +22,28 @@
 <body>
     {% include '_partials/_header.html.twig' %}
 
+    {% for label, messages in app.flashes %}
+    <div class="flash flash-{{ label }}">
+        <span class="close"
+            onclick="this.parentElement.style.opacity='0'; setTimeout(()=>this.parentElement.remove(),500)">×</span>
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+
+
     {% block body %}{% endblock %}
 
+    <script>
+        setTimeout(() => {
+            document.querySelectorAll('.flash').forEach(flash => {
+                flash.style.opacity = '0';
+                setTimeout(() => flash.remove(), 500);
+            });
+        }, 5000); // 5 seconds
+    </script>
 
 </body>
 
