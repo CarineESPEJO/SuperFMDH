@@ -47,10 +47,6 @@ class Listing implements TimestampableInterface
     private ?string $city = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\Regex(
-        pattern: '/\.(jpg|jpeg|png|webp)$/i',
-        message: 'The image must be a JPG, JPEG, PNG, or WEBP file'
-    )]
     private ?string $image_url = null;
 
     // 🔹 Relations
@@ -82,7 +78,6 @@ class Listing implements TimestampableInterface
     {
         return $this->id;
     }
-
     public function getTitle(): ?string
     {
         return $this->title;
@@ -92,7 +87,6 @@ class Listing implements TimestampableInterface
         $this->title = $title;
         return $this;
     }
-
     public function getDescription(): ?string
     {
         return $this->description;
@@ -102,7 +96,6 @@ class Listing implements TimestampableInterface
         $this->description = $description;
         return $this;
     }
-
     public function getPrice(): ?float
     {
         return $this->price;
@@ -112,7 +105,6 @@ class Listing implements TimestampableInterface
         $this->price = round($price, 2);
         return $this;
     }
-
     public function getCity(): ?string
     {
         return $this->city;
@@ -122,7 +114,6 @@ class Listing implements TimestampableInterface
         $this->city = $city;
         return $this;
     }
-
     public function getImageUrl(): ?string
     {
         return $this->image_url;
@@ -132,7 +123,6 @@ class Listing implements TimestampableInterface
         $this->image_url = $image_url;
         return $this;
     }
-
     public function getPropertyType(): ?PropertyType
     {
         return $this->propertyType;
@@ -142,7 +132,6 @@ class Listing implements TimestampableInterface
         $this->propertyType = $propertyType;
         return $this;
     }
-
     public function getTransactionType(): ?TransactionType
     {
         return $this->transactionType;
@@ -152,7 +141,6 @@ class Listing implements TimestampableInterface
         $this->transactionType = $transactionType;
         return $this;
     }
-
     public function getUser(): ?User
     {
         return $this->user;
@@ -168,7 +156,6 @@ class Listing implements TimestampableInterface
     {
         return $this->favoritedBy;
     }
-
     public function addFavoritedBy(User $user): self
     {
         if (!$this->favoritedBy->contains($user)) {
@@ -177,7 +164,6 @@ class Listing implements TimestampableInterface
         }
         return $this;
     }
-
     public function removeFavoritedBy(User $user): self
     {
         if ($this->favoritedBy->removeElement($user)) {

@@ -2,7 +2,7 @@
 
 <article class="card">
     <a class="card-link" href="{{ path('listing', {'id': listing.id}) }}">
-        <img src="{{ asset(listing.imageUrl) }}" alt="Image de l'annonce">
+        <img src="{{ asset(listing.imageUrl) }}" alt="{{ listing.title }}">
         <div>
             <h3 class="title">{{ listing.title|e }}</h3>
             <h4>{{ listing.price|e }} {{ listing.transactionType.name == 'Rent' ? '€/mois' : '€' }}</h4>

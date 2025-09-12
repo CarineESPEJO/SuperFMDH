@@ -4,15 +4,17 @@ namespace App\Controller\Catalogs\Listing;
 
 use App\Repository\ListingRepository;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use App\Entity\Listing;
 use App\Form\ListingType;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class ListingController extends AbstractController
 {
@@ -20,13 +22,12 @@ class ListingController extends AbstractController
     public function listing(int $id, ListingRepository $listingRepository, UserRepository $userRepository): Response
     {
         $listing = $listingRepository->find($id);
-
         if (!$listing) {
             throw $this->createNotFoundException('Listing not found');
         }
 
-        // user 1 en fallback en attendant de le remplacer par vrai utilisateur connecté
-        $user = $userRepository->find(1);
+        // Temporary fallback user, replace with actual logged-in user
+        $user = $this->getUser() ?? $userRepository->find(1);
         $userId = $user ? $user->getId() : null;
 
         $isFavorited = false;
@@ -46,10 +47,10 @@ class ListingController extends AbstractController
     public function createListing(
         Request $request,
         EntityManagerInterface $entityManager,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        SluggerInterface $slugger
     ): Response {
         $user = $this->getUser() ?? $userRepository->find(1);
-
         $listing = new Listing();
         $listing->setUser($user);
 
@@ -57,6 +58,25 @@ class ListingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image_file')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $extension = $imageFile->guessExtension();
+                $newFilename = 'file_' . uniqid('', true) . '.' . $extension;
+
+                $propertyTypeFolder = strtolower($listing->getPropertyType()->getName()); // houses or apartments
+                $targetDirectory = $this->getParameter('listings_directory') . '/' . $propertyTypeFolder;
+
+                try {
+                    $imageFile->move($targetDirectory, $newFilename);
+                    $listing->setImageUrl('images/listings/' . $propertyTypeFolder . '/' . $newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Failed to upload image.');
+                }
+            }
+
             $entityManager->persist($listing);
             $entityManager->flush();
 
@@ -68,14 +88,14 @@ class ListingController extends AbstractController
         ]);
     }
 
-
     #[Route('/listing/modify/{id}', name: 'modifylisting', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     #[IsGranted('ROLE_AGENT')]
     public function modifyListing(
         int $id,
         ListingRepository $listingRepository,
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        SluggerInterface $slugger
     ): Response {
         $listing = $listingRepository->find($id);
         if (!$listing) {
@@ -86,13 +106,33 @@ class ListingController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush(); // updated_at will be automatically updated
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image_file')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $extension = $imageFile->guessExtension();
+                $newFilename = 'file_' . uniqid('', true) . '.' . $extension;
+
+                $propertyTypeFolder = strtolower($listing->getPropertyType()->getName()); // houses or apartments
+                $targetDirectory = $this->getParameter('listings_directory') . '/' . $propertyTypeFolder;
+
+                try {
+                    $imageFile->move($targetDirectory, $newFilename);
+                    $listing->setImageUrl('images/listings/' . $propertyTypeFolder . '/' . $newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Failed to upload image.');
+                }
+            }
+
+            $entityManager->flush(); // updated_at handled by TimestampableTrait
+
             return $this->redirectToRoute('listing', ['id' => $listing->getId()]);
         }
 
         return $this->render('catalogs/listing/modify-listing.html.twig', [
             'form' => $form->createView(),
-            'listing' => $listing
+            'listing' => $listing,
         ]);
     }
 }
